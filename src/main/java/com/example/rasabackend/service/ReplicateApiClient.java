@@ -36,7 +36,7 @@ public class ReplicateApiClient {
 
                 // Extract the "get" URL from the "urls" object
                 String getUrl = urls.path("get").asText();
-                System.out.println(getUrl);
+//                System.out.println(getUrl);
                 return getUrl;
             } else {
                 logger.error("Error: {} - {}", response.getStatusCodeValue(), response.getBody());
@@ -60,10 +60,10 @@ public class ReplicateApiClient {
 
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode responseBody = response.getBody();
-            JsonNode output = responseBody.path("output");
             String status = String.valueOf(responseBody.path("status"));
 //            System.out.println(status);
             if (status.equals("\"succeeded\"")){
+                JsonNode output = responseBody.path("output");
                 return output;
             }
             try {

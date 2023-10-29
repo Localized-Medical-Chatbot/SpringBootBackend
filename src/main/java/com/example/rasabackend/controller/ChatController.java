@@ -16,7 +16,6 @@ public class ChatController {
     @PostMapping("/chat")
     public JsonNode[] handleChatRequest(@RequestBody JsonNode jsonNode) {
 
-//        System.out.println(jsonNode.toString());
         jsonNode = TranslatorService.translateTOEnglish(jsonNode);
         String message = jsonNode.path("message").asText();
         System.out.println(jsonNode.toString());
@@ -39,32 +38,30 @@ public class ChatController {
         JsonNode[] rasaResponses = responseEntity.getBody();
 
         if (rasaResponses != null && rasaResponses.length > 0) {
-//            JsonNode[] rasaResponse = rasaResponses
             System.out.println(rasaResponses[0].toString());
 
             for (int i = 0; i < rasaResponses.length; i++) {
                 rasaResponses[i] = TranslatorService.translateTOSinhala(rasaResponses[i]);
             }
-            //        rasaResponse[0] = TranslatorService.translateTOSinhala(rasaResponse[0]);
             rasaResponses[0] = TranslatorService.translatePayloads(rasaResponses);
         }
 
-//        else{
+        else{
             ReplicateApiClient client = new ReplicateApiClient();
             String prompt = message;
 
             String predictionURL = client.getURL(prompt);
             // Poll for prediction status
             JsonNode botMessage = client.getPrediction(predictionURL);
-            System.out.println(botMessage.toString());
             LLMMessagePostProcess llmMessagePostProcess = new LLMMessagePostProcess();
             rasaResponses = llmMessagePostProcess.createResponseJson(jsonNode,botMessage);
             System.out.println(rasaResponses[0].toString());
-        for (int i = 0; i < rasaResponses.length; i++) {
-                rasaResponses[i] = TranslatorService.translateTOSinhala(rasaResponses[i]);
-            }
+
+            for (int i = 0; i < rasaResponses.length; i++) {
+                    rasaResponses[i] = TranslatorService.translateTOSinhala(rasaResponses[i]);
+                }
             System.out.println(rasaResponses[0].toString());
-//        }
+        }
 
         return rasaResponses;
     }
