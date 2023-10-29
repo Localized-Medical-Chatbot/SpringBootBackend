@@ -1,5 +1,6 @@
 package com.example.rasabackend.controller;
 
+import com.example.rasabackend.service.LLMMessagePostProcess;
 import com.example.rasabackend.service.ReplicateApiClient;
 import com.example.rasabackend.service.TranslatorService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +18,8 @@ public class ChatController {
 
 //        System.out.println(jsonNode.toString());
         jsonNode = TranslatorService.translateTOEnglish(jsonNode);
+        String message = jsonNode.path("message").asText();
+        System.out.println(jsonNode.toString());
 //        // Call Rasa server
         String rasaUrl = "http://0.0.0.0:5005/webhooks/rest/webhook";
         HttpHeaders headers = new HttpHeaders();
@@ -46,8 +49,23 @@ public class ChatController {
             rasaResponses[0] = TranslatorService.translatePayloads(rasaResponses);
         }
 
-        // You can perform additional actions here before sending the response to the frontend.
-        return rasaResponse;
+//        else{
+            ReplicateApiClient client = new ReplicateApiClient();
+            String prompt = message;
+
+            String predictionURL = client.getURL(prompt);
+            // Poll for prediction status
+            JsonNode botMessage = client.getPrediction(predictionURL);
+            LLMMessagePostProcess llmMessagePostProcess = new LLMMessagePostProcess();
+            rasaResponses = llmMessagePostProcess.createResponseJson(jsonNode,botMessage);
+            System.out.println(rasaResponses[0].toString());
+        for (int i = 0; i < rasaResponses.length; i++) {
+                rasaResponses[i] = TranslatorService.translateTOSinhala(rasaResponses[i]);
+            }
+            System.out.println(rasaResponses[0].toString());
+//        }
+
+        return rasaResponses;
     }
 }
 

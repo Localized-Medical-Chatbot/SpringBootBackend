@@ -48,7 +48,7 @@ public class ReplicateApiClient {
         }
 
 
-    public String getPrediction(String predictionURL) {
+    public JsonNode getPrediction(String predictionURL) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(apiToken); // Set your authorization token
         headers.set("Authorization", apiToken);
@@ -64,8 +64,7 @@ public class ReplicateApiClient {
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode responseBody = response.getBody();
             JsonNode output = responseBody.path("output");
-            String outputString = output.toString();
-            return outputString;
+            return output;
         } else {
             // Handle error
             logger.error("Error: {} - {}", response.getStatusCodeValue(), response.getBody());
