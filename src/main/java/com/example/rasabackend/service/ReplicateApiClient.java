@@ -6,10 +6,6 @@ import org.springframework.web.client.RestTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.net.URL;
 
 public class ReplicateApiClient {
 
@@ -40,6 +36,7 @@ public class ReplicateApiClient {
 
                 // Extract the "get" URL from the "urls" object
                 String getUrl = urls.path("get").asText();
+                System.out.println(getUrl);
                 return getUrl;
             } else {
                 logger.error("Error: {} - {}", response.getStatusCodeValue(), response.getBody());
@@ -50,7 +47,7 @@ public class ReplicateApiClient {
 
     public JsonNode getPrediction(String predictionURL) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(apiToken); // Set your authorization token
+        headers.setBearerAuth(apiToken);
         headers.set("Authorization", apiToken);
 
         HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(headers);
@@ -64,7 +61,19 @@ public class ReplicateApiClient {
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode responseBody = response.getBody();
             JsonNode output = responseBody.path("output");
-            return output;
+            String status = String.valueOf(responseBody.path("status"));
+//            System.out.println(status);
+            if (status.equals("\"succeeded\"")){
+                return output;
+            }
+            try {
+                // Sleep for a certain duration (e.g., 1 second)
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // Handle the exception if needed
+                e.printStackTrace();
+            }
+            return getPrediction(predictionURL);
         } else {
             // Handle error
             logger.error("Error: {} - {}", response.getStatusCodeValue(), response.getBody());

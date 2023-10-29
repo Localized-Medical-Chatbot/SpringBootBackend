@@ -56,6 +56,7 @@ public class ChatController {
             String predictionURL = client.getURL(prompt);
             // Poll for prediction status
             JsonNode botMessage = client.getPrediction(predictionURL);
+            System.out.println(botMessage.toString());
             LLMMessagePostProcess llmMessagePostProcess = new LLMMessagePostProcess();
             rasaResponses = llmMessagePostProcess.createResponseJson(jsonNode,botMessage);
             System.out.println(rasaResponses[0].toString());
