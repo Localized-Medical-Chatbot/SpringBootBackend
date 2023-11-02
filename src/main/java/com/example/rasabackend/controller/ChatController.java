@@ -36,7 +36,7 @@ public class ChatController {
 
         // Extract Rasa response
         JsonNode[] rasaResponses = responseEntity.getBody();
-
+//        System.out.println(message.equals("/restart"));
         if (rasaResponses != null && rasaResponses.length > 0) {
             System.out.println(rasaResponses[0].toString());
 
@@ -46,6 +46,7 @@ public class ChatController {
             rasaResponses[0] = TranslatorService.translatePayloads(rasaResponses);
         }
 
+//        else if (!message.equals("/restart")){
         else{
             ReplicateApiClient client = new ReplicateApiClient();
             String prompt = message;
